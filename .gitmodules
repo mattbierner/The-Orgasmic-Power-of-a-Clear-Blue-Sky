@@ -1,0 +1,6 @@
+[submodule "app/lovense-ios-controller"]
+	path = app/lovense-ios-controller
+	url = git@github.com:mattbierner/lovense-ios-controller.git
+[submodule "app/WebViewJavascriptBridge"]
+	path = app/WebViewJavascriptBridge
+	url = https://github.com/marcuswestin/WebViewJavascriptBridge.git

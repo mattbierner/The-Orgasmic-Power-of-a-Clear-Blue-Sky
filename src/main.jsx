@@ -9,6 +9,16 @@ import loadImage from './util/load_image'
 const loadStream = (number) =>
     loadImage(`${config.viewerUrl}?action=stream_${number}`)
 
+function setupWebViewJavascriptBridge(callback) {
+    if (window.WebViewJavascriptBridge) { return callback(WebViewJavascriptBridge); }
+    if (window.WVJBCallbacks) { return window.WVJBCallbacks.push(callback); }
+    window.WVJBCallbacks = [callback];
+    var WVJBIframe = document.createElement('iframe');
+    WVJBIframe.style.display = 'none';
+    WVJBIframe.src = 'https://__bridge_loaded__';
+    document.documentElement.appendChild(WVJBIframe);
+    setTimeout(function () { document.documentElement.removeChild(WVJBIframe) }, 0)
+}
 
 class Main extends React.Component {
     constructor(props) {
@@ -23,6 +33,15 @@ class Main extends React.Component {
             }).catch(x => {
                 console.error(x)
             })
+
+        setupWebViewJavascriptBridge(bridge => {
+            // Inform webview that we are ready
+            bridge.callHandler('ready', {}, (response) => { /* noop */ })
+
+            bridge.callHandler('vibrate', { 'strength': '1' }, function(responseData) {
+                alert("JS received response:", responseData)
+            })
+        })
     }
 
     render() {

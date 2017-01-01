@@ -1,6 +1,5 @@
 #import "ViewController.h"
 #import "ASScreenRecorder.h"
-#import "LoveSense.h"
 
 NSString* const tenomeUrl = @"tenomeUrl";
 NSString* const defaultUrl = @"http://192.168.1.6:8080/test.html";
@@ -11,19 +10,39 @@ NSString* const defaultUrl = @"http://192.168.1.6:8080/test.html";
 @synthesize recordButton;
 @synthesize refreshButton;
 
-
-
 - (void) viewDidLoad {
     [super viewDidLoad];
     
-    [webView.scrollView setScrollEnabled:NO];
+    _ready = NO;
+    _device = nil;
     
+    [self.webView.scrollView setScrollEnabled:NO];
+   
+    // setup js bridge
+    self.bridge = [WebViewJavascriptBridge bridgeForWebView:webView];
+    //[WebViewJavascriptBridge enableLogging];
+   
+    [self.bridge setWebViewDelegate:self];
+    [self.bridge registerHandler:@"ready" handler:^(id data, WVJBResponseCallback responseCallback) {
+        NSLog(@"webview is ready");
+        _ready = YES;
+        responseCallback(data);
+    }];
+    
+    [self.bridge registerHandler:@"vibrate" handler:^(id data, WVJBResponseCallback responseCallback) {
+        if (_device) {
+            [_device setVibration:1 onComplete:nil];
+        }
+        responseCallback(data);
+    }];
+    
+    // Set up two tap to stop recording
     UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(onDoubleTap:)];
     tapGesture.numberOfTapsRequired = 2;
     tapGesture.delegate = self;
-    
     [self.webView addGestureRecognizer:tapGesture];
     
+    // Set up bluetooth
     _manager = [[CBCentralManager alloc] initWithDelegate:self queue:nil options:nil];
 }
 
@@ -48,6 +67,7 @@ NSString* const defaultUrl = @"http://192.168.1.6:8080/test.html";
 {
     NSLog(@"Discovered %@", peripheral.name);
     const NSUUID* hushUuid = [[NSUUID alloc] initWithUUIDString:@"FB7E00D6-7C6A-480F-B4C7-CABC1973AE6E"];
+    const NSUUID* lushUuid = [[NSUUID alloc] initWithUUIDString:@"90635C08-1AF8-42A2-9477-E3F2A1E54DA7"];
     
     if ([peripheral.identifier isEqual:hushUuid]) {
         [_manager stopScan];
@@ -56,10 +76,18 @@ NSString* const defaultUrl = @"http://192.168.1.6:8080/test.html";
     }
 }
 
-- (void)centralManager:(CBCentralManager *)central
-  didConnectPeripheral:(CBPeripheral *)peripheral {
-    _device = [[LoveSense alloc] initWithPeripheral:peripheral onReady:^(LoveSense* device){
-        [device setVibration:1];
+- (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral {
+    [LovenseVibratorController createWithPeripheral:peripheral onReady:^(LovenseVibratorController* device) {
+        _device = device;
+        [device getBattery:^(NSNumber* result, NSError* err) {
+            NSLog(@"Battery: %@", result);
+        }];
+        
+        
+        [device getDeviceType:^(NSString* result, NSError* err) {
+            NSLog(@"Type: %@", result);
+        }];
+ 
     }];
 }
 
@@ -116,5 +144,9 @@ NSString* const defaultUrl = @"http://192.168.1.6:8080/test.html";
     }];
 }
 
+
+- (void) webViewDidStartLoad:(UIWebView *)webView {
+    _ready = NO;
+}
 
 @end

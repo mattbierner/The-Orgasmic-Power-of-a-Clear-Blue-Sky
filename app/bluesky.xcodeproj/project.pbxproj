@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8908AFE01E19989E00A42562 /* LovenseController.m in Sources */ = {isa = PBXBuildFile; fileRef = 8908AFDF1E19989E00A42562 /* LovenseController.m */; };
+		8908B0C91E19A64400A42562 /* WebViewJavascriptBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 8908B0C21E19A64400A42562 /* WebViewJavascriptBridge.m */; };
+		8908B0CA1E19A64400A42562 /* WebViewJavascriptBridge_JS.m in Sources */ = {isa = PBXBuildFile; fileRef = 8908B0C41E19A64400A42562 /* WebViewJavascriptBridge_JS.m */; };
+		8908B0CB1E19A64400A42562 /* WebViewJavascriptBridgeBase.m in Sources */ = {isa = PBXBuildFile; fileRef = 8908B0C61E19A64400A42562 /* WebViewJavascriptBridgeBase.m */; };
+		8908B0CC1E19A64400A42562 /* WKWebViewJavascriptBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 8908B0C81E19A64400A42562 /* WKWebViewJavascriptBridge.m */; };
 		89DC65601E187D5D00DFB291 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 89DC65541E187D5D00DFB291 /* AppDelegate.m */; };
 		89DC65611E187D5D00DFB291 /* ASScreenRecorder.m in Sources */ = {isa = PBXBuildFile; fileRef = 89DC65561E187D5D00DFB291 /* ASScreenRecorder.m */; };
 		89DC65621E187D5D00DFB291 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 89DC65571E187D5D00DFB291 /* Assets.xcassets */; };
@@ -15,10 +20,19 @@
 		89DC65651E187D5D00DFB291 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 89DC655D1E187D5D00DFB291 /* Info.plist */; };
 		89DC65661E187D5D00DFB291 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 89DC655F1E187D5D00DFB291 /* ViewController.m */; };
 		89DC65681E187D9700DFB291 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 89DC65671E187D9700DFB291 /* main.m */; };
-		89DC656B1E1884A400DFB291 /* LoveSense.m in Sources */ = {isa = PBXBuildFile; fileRef = 89DC656A1E1884A400DFB291 /* LoveSense.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		8908AFDE1E19989E00A42562 /* LovenseController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LovenseController.h; path = "lovense-ios-controller/lovense-ios-controller/LovenseController.h"; sourceTree = SOURCE_ROOT; };
+		8908AFDF1E19989E00A42562 /* LovenseController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LovenseController.m; path = "lovense-ios-controller/lovense-ios-controller/LovenseController.m"; sourceTree = SOURCE_ROOT; };
+		8908B0C11E19A64400A42562 /* WebViewJavascriptBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebViewJavascriptBridge.h; sourceTree = "<group>"; };
+		8908B0C21E19A64400A42562 /* WebViewJavascriptBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebViewJavascriptBridge.m; sourceTree = "<group>"; };
+		8908B0C31E19A64400A42562 /* WebViewJavascriptBridge_JS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebViewJavascriptBridge_JS.h; sourceTree = "<group>"; };
+		8908B0C41E19A64400A42562 /* WebViewJavascriptBridge_JS.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebViewJavascriptBridge_JS.m; sourceTree = "<group>"; };
+		8908B0C51E19A64400A42562 /* WebViewJavascriptBridgeBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebViewJavascriptBridgeBase.h; sourceTree = "<group>"; };
+		8908B0C61E19A64400A42562 /* WebViewJavascriptBridgeBase.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WebViewJavascriptBridgeBase.m; sourceTree = "<group>"; };
+		8908B0C71E19A64400A42562 /* WKWebViewJavascriptBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WKWebViewJavascriptBridge.h; sourceTree = "<group>"; };
+		8908B0C81E19A64400A42562 /* WKWebViewJavascriptBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WKWebViewJavascriptBridge.m; sourceTree = "<group>"; };
 		891AB0DC1D62C392004C8781 /* bluesky.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = bluesky.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		89DC65531E187D5D00DFB291 /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = bluesky/AppDelegate.h; sourceTree = SOURCE_ROOT; };
 		89DC65541E187D5D00DFB291 /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = bluesky/AppDelegate.m; sourceTree = SOURCE_ROOT; };
@@ -31,8 +45,6 @@
 		89DC655E1E187D5D00DFB291 /* ViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ViewController.h; path = bluesky/ViewController.h; sourceTree = SOURCE_ROOT; };
 		89DC655F1E187D5D00DFB291 /* ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ViewController.m; path = bluesky/ViewController.m; sourceTree = SOURCE_ROOT; };
 		89DC65671E187D9700DFB291 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = bluesky/main.m; sourceTree = SOURCE_ROOT; };
-		89DC65691E1884A400DFB291 /* LoveSense.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LoveSense.h; path = bluesky/LoveSense.h; sourceTree = SOURCE_ROOT; };
-		89DC656A1E1884A400DFB291 /* LoveSense.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = LoveSense.m; path = bluesky/LoveSense.m; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,9 +58,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		8908B0C01E19A64400A42562 /* WebViewJavascriptBridge */ = {
+			isa = PBXGroup;
+			children = (
+				8908B0C11E19A64400A42562 /* WebViewJavascriptBridge.h */,
+				8908B0C21E19A64400A42562 /* WebViewJavascriptBridge.m */,
+				8908B0C31E19A64400A42562 /* WebViewJavascriptBridge_JS.h */,
+				8908B0C41E19A64400A42562 /* WebViewJavascriptBridge_JS.m */,
+				8908B0C51E19A64400A42562 /* WebViewJavascriptBridgeBase.h */,
+				8908B0C61E19A64400A42562 /* WebViewJavascriptBridgeBase.m */,
+				8908B0C71E19A64400A42562 /* WKWebViewJavascriptBridge.h */,
+				8908B0C81E19A64400A42562 /* WKWebViewJavascriptBridge.m */,
+			);
+			name = WebViewJavascriptBridge;
+			path = WebViewJavascriptBridge/WebViewJavascriptBridge;
+			sourceTree = "<group>";
+		};
 		891AB0D31D62C392004C8781 = {
 			isa = PBXGroup;
 			children = (
+				8908B0C01E19A64400A42562 /* WebViewJavascriptBridge */,
 				891AB0DE1D62C397004C8781 /* bluesky */,
 				891AB0DD1D62C392004C8781 /* Products */,
 			);
@@ -65,6 +94,8 @@
 		891AB0DE1D62C397004C8781 /* bluesky */ = {
 			isa = PBXGroup;
 			children = (
+				8908AFDE1E19989E00A42562 /* LovenseController.h */,
+				8908AFDF1E19989E00A42562 /* LovenseController.m */,
 				89DC65531E187D5D00DFB291 /* AppDelegate.h */,
 				89DC65541E187D5D00DFB291 /* AppDelegate.m */,
 				89DC65551E187D5D00DFB291 /* ASScreenRecorder.h */,
@@ -74,8 +105,6 @@
 				89DC655D1E187D5D00DFB291 /* Info.plist */,
 				89DC655E1E187D5D00DFB291 /* ViewController.h */,
 				89DC655F1E187D5D00DFB291 /* ViewController.m */,
-				89DC65691E1884A400DFB291 /* LoveSense.h */,
-				89DC656A1E1884A400DFB291 /* LoveSense.m */,
 				891AB0DF1D62C397004C8781 /* Supporting Files */,
 			);
 			name = bluesky;
@@ -172,9 +201,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8908B0CB1E19A64400A42562 /* WebViewJavascriptBridgeBase.m in Sources */,
+				8908AFE01E19989E00A42562 /* LovenseController.m in Sources */,
+				8908B0C91E19A64400A42562 /* WebViewJavascriptBridge.m in Sources */,
 				89DC65661E187D5D00DFB291 /* ViewController.m in Sources */,
+				8908B0CA1E19A64400A42562 /* WebViewJavascriptBridge_JS.m in Sources */,
+				8908B0CC1E19A64400A42562 /* WKWebViewJavascriptBridge.m in Sources */,
 				89DC65601E187D5D00DFB291 /* AppDelegate.m in Sources */,
-				89DC656B1E1884A400DFB291 /* LoveSense.m in Sources */,
 				89DC65681E187D9700DFB291 /* main.m in Sources */,
 				89DC65611E187D5D00DFB291 /* ASScreenRecorder.m in Sources */,
 			);
