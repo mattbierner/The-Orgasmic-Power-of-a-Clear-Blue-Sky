@@ -31,9 +31,12 @@ NSString* const defaultUrl = @"http://192.168.1.6:8080/test.html";
     
     [self.bridge registerHandler:@"vibrate" handler:^(id data, WVJBResponseCallback responseCallback) {
         if (_device) {
-            [_device setVibration:1 onComplete:nil];
+            NSDictionary* values = data;
+            NSNumber* s = [values valueForKey:@"strength"];
+            [_device setVibration:[s intValue] onComplete:^(BOOL ok, NSError* err) {
+                responseCallback(data);
+            }];
         }
-        responseCallback(data);
     }];
     
     // Set up two tap to stop recording

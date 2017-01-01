@@ -13,7 +13,7 @@ class Indicator extends React.Component {
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
                     borderRadius: '100px',
-                    border: `4px solid rgba(${this.props.color[0]}, ${this.props.color[1]}, ${this.props.color[2]}, 0.5)` }}/>
+                    border: `4px solid rgba(${this.props.color.r}, ${this.props.color.g}, ${this.props.color.b}, 0.5)` }}/>
         )
     }
 }
@@ -22,7 +22,7 @@ export default class Viewer extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            color: [0, 0, 0]
+            color: { r: 0, g: 0, b: 0 }
         }
     }
 
@@ -64,7 +64,7 @@ export default class Viewer extends React.Component {
 
         ]
         const center = { x: Math.round(this._canvas.width / 2), y: Math.round(this._canvas.height / 2) }
-        const sum = [0, 0, 0]
+        const sum = {r :0, g: 0, b: 0}
         for (const sampleSet of sampleSets) {
             const weight = sampleSet.weight * (1.0 / sampleSet.count)
             const dAngle = Math.PI * 2.0 / sampleSet.count
@@ -72,13 +72,17 @@ export default class Viewer extends React.Component {
             for (let i = 0; i < sampleSet.count; ++i, angle += dAngle) {
                 const offset = { x: sampleSet.offset * Math.sin(angle), y: sampleSet.offset * Math.cos(angle)}
                 const pixel = ctx.getImageData(center.x + offset.x, center.y + offset.y, 1, 1).data;
-                sum[0] += weight * pixel[0]
-                sum[1] += weight * pixel[1]
-                sum[2] += weight * pixel[2]
+                sum.r += weight * pixel[0]
+                sum.g += weight * pixel[1]
+                sum.b += weight * pixel[2]
             }
         }
 
-        this.setState({ color: [Math.floor(sum[0]), Math.floor(sum[1]), Math.floor(sum[2])] })
+        const color = {r: Math.floor(sum.r), g: Math.floor(sum.g), b: Math.floor(sum.b)}
+        this.setState({ color: color })
+        if (this.props.onSampleChanged) {
+            this.props.onSampleChanged(color)
+        }
     }
 
     render() {

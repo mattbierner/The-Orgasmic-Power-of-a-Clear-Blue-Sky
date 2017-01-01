@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+const tinycolor = require("tinycolor2");
 
 import Viewer from './viewer'
 import * as config from './config'
@@ -35,19 +36,32 @@ class Main extends React.Component {
             })
 
         setupWebViewJavascriptBridge(bridge => {
+            this._bridge = bridge
             // Inform webview that we are ready
             bridge.callHandler('ready', {}, (response) => { /* noop */ })
 
-            bridge.callHandler('vibrate', { 'strength': '1' }, function(responseData) {
-                alert("JS received response:", responseData)
-            })
+        
+        })
+    }
+
+    onSampleChanged(rgb) {
+        if (!this._bridge || this._updating)
+            return;
+
+        const hsl = tinycolor(rgb).toHsl();
+        console.log(hsl);
+        this._updating  = true
+
+        const s = Math.floor(hsl.s * 20);
+        this._bridge.callHandler('vibrate', { 'strength': s }, responseData => {
+            this._updating = false
         })
     }
 
     render() {
         return (
             <div className="main">
-                <Viewer image={this.state.image} />
+                <Viewer image={this.state.image} onSampleChanged={this.onSampleChanged.bind(this)} />
                 <Viewer image={this.state.image} />
             </div>)
     }
