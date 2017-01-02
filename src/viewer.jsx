@@ -3,17 +3,12 @@ import ReactDOM from 'react-dom';
 
 class Indicator extends React.Component {
     render() {
+        const color = `rgba(${this.props.color.r}, ${this.props.color.g}, ${this.props.color.b}, 0.5)`;
         return (
-            <div className='indicator'
-                style={{
-                    width: '25px',
-                    height: '25px',
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    borderRadius: '100px',
-                    border: `4px solid rgba(${this.props.color.r}, ${this.props.color.g}, ${this.props.color.b}, 0.5)` }}/>
+            <div>
+                <div className='indicator' style={{borderColor: color, color: color }} />
+                <div className='lower-indicator' style={{background: `rgb(${this.props.color.r}, ${this.props.color.g}, ${this.props.color.b})` }} />
+            </div>
         )
     }
 }

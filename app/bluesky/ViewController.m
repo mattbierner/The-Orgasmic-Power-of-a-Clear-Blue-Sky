@@ -13,21 +13,12 @@ NSString* const defaultUrl = @"http://192.168.1.6:8080/test.html";
 - (void) viewDidLoad {
     [super viewDidLoad];
     
-    _ready = NO;
     _device = nil;
     
     [self.webView.scrollView setScrollEnabled:NO];
    
     // setup js bridge
     self.bridge = [WebViewJavascriptBridge bridgeForWebView:webView];
-    //[WebViewJavascriptBridge enableLogging];
-   
-    [self.bridge registerHandler:@"ready" handler:^(id data, WVJBResponseCallback responseCallback) {
-        NSLog(@"webview is ready");
-        _ready = YES;
-        responseCallback(data);
-    }];
-    
     [self.bridge registerHandler:@"vibrate" handler:^(id data, WVJBResponseCallback responseCallback) {
         if (_device) {
             NSDictionary* values = data;
@@ -59,7 +50,7 @@ NSString* const defaultUrl = @"http://192.168.1.6:8080/test.html";
             NSLog(@"CoreBluetooth BLE hardware is powered off");
             break;
         case CBCentralManagerStatePoweredOn:
-            [_manager scanForPeripheralsWithServices:nil options:nil];
+            [_manager scanForPeripheralsWithServices:@[[LovenseVibratorController serviceUUID]] options:nil];
             break;
         default:
             break;
@@ -72,14 +63,11 @@ NSString* const defaultUrl = @"http://192.168.1.6:8080/test.html";
                   RSSI:(NSNumber *)RSSI
 {
     NSLog(@"Discovered %@", peripheral.name);
-    const NSUUID* hushUuid = [[NSUUID alloc] initWithUUIDString:@"FB7E00D6-7C6A-480F-B4C7-CABC1973AE6E"];
-    const NSUUID* lushUuid = [[NSUUID alloc] initWithUUIDString:@"90635C08-1AF8-42A2-9477-E3F2A1E54DA7"];
     
-    if ([peripheral.identifier isEqual:hushUuid]) {
-        [_manager stopScan];
-        _peripheral = peripheral;
-        [_manager connectPeripheral:peripheral options:nil];
-    }
+    // Just use the first peripheral with support found
+    [_manager stopScan];
+    _peripheral = peripheral;
+    [_manager connectPeripheral:peripheral options:nil];
 }
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral {
@@ -89,11 +77,9 @@ NSString* const defaultUrl = @"http://192.168.1.6:8080/test.html";
             NSLog(@"Battery: %@", result);
         }];
         
-        
         [device getDeviceType:^(NSString* result, NSError* err) {
             NSLog(@"Type: %@", result);
         }];
- 
     }];
 }
 

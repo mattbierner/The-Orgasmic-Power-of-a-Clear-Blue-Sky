@@ -8,11 +8,10 @@
     UIGestureRecognizerDelegate,
     CBCentralManagerDelegate>
 {
-    BOOL _ready;
     NSURL* _path;
     CBCentralManager* _manager;
-    LovenseVibratorController* _device;
     CBPeripheral* _peripheral;
+    LovenseVibratorController* _device;
 }
 
 @property (nonatomic, weak) IBOutlet UIWebView* webView;
@@ -21,11 +20,7 @@
 
 @property WebViewJavascriptBridge* bridge;
 
-
 - (IBAction) refresh:(id)sender;
-
 - (IBAction) hitRecordButton:(id)sender;
 
-
 @end
-

@@ -68,6 +68,10 @@
 
 	var _load_image2 = _interopRequireDefault(_load_image);
 
+	var _luminance = __webpack_require__(183);
+
+	var _luminance2 = _interopRequireDefault(_luminance);
+
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -78,7 +82,7 @@
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-	var tinycolor = __webpack_require__(181);
+	var maxStrength = 20;
 
 	var loadStream = function loadStream(number) {
 	    return (0, _load_image2.default)(config.viewerUrl + '?action=stream_' + number);
@@ -101,9 +105,6 @@
 	    }, 0);
 	}
 
-	var lowestFrequency = 0.05;
-	var highestFrequency = 1.2;
-
 	var Main = function (_React$Component) {
 	    _inherits(Main, _React$Component);
 
@@ -116,10 +117,6 @@
 	            image: null
 	        };
 
-	        _this._frequency = lowestFrequency;
-	        _this._strength = 0;
-	        _this._enabled = true;
-
 	        loadStream(0).then(function (img1) {
 	            _this.setState({ image: img1 });
 	        }).catch(function (x) {
@@ -128,58 +125,20 @@
 
 	        setupWebViewJavascriptBridge(function (bridge) {
 	            _this._bridge = bridge;
-	            // Inform webview that we are ready
-	            bridge.callHandler('ready', {}, function (response) {
-	                _this.updateVibrations();
+
+	            _this._vibrator = new _luminance2.default(function (strength, cb) {
+	                strength = Math.floor(strength * maxStrength);
+
+	                _this._bridge.callHandler('vibrate', { strength: strength }, cb);
 	            });
 	        });
 	        return _this;
 	    }
 
 	    _createClass(Main, [{
-	        key: 'updateVibrations',
-	        value: function updateVibrations() {
-	            var _this2 = this;
-
-	            var time = Date.now();
-
-	            var period = lowestFrequency + this._frequency * (highestFrequency - lowestFrequency);
-	            var strength = Math.floor(this._strength * 20) * (this._enabled ? 1 : 0);
-
-	            console.log(strength, period);
-	            this._bridge.callHandler('vibrate', { strength: strength }, function (responseData) {
-	                var elapsed = (Date.now() - time) / 1000;
-	                setTimeout(function () {
-	                    var afterStartTime = Date.now();
-	                    _this2._bridge.callHandler('vibrate', { strength: 0 }, function (responseData) {
-	                        var elapsed = (Date.now() - afterStartTime) / 1000;
-	                        setTimeout(function () {
-	                            return _this2.updateVibrations();
-	                        }, Math.max(0, (period - elapsed) * 1000));
-	                    });
-	                }, Math.max(0, (period - elapsed) * 1000));
-	            });
-	        }
-	    }, {
 	        key: 'onSampleChanged',
 	        value: function onSampleChanged(rgb) {
-	            var hsv = tinycolor(rgb).toHsv();
-	            if (hsv.v < 0.3 || hsv.s < 0.3) {
-	                this._strength = 0;
-	                this._enabled = false;
-	            } else {
-	                this._strength = (hsv.s - 0.3) / 2.0 + (hsv.v - 0.3) / 2.0;
-	                this._enabled = true;
-	            }
-
-	            var maxHue = 280;
-	            var frequency = hsv.h;
-	            // map red - blue to standard range, but wrap magenta back around
-	            if (frequency > maxHue) {
-	                frequency = maxHue - (frequency - maxHue) / (360 - maxHue) * maxHue;
-	            }
-
-	            this._frequency = 1.0 - frequency / 300;
+	            this._vibrator && this._vibrator.onSampleChanged(rgb);
 	        }
 	    }, {
 	        key: 'render',
@@ -21693,16 +21652,13 @@
 	    _createClass(Indicator, [{
 	        key: 'render',
 	        value: function render() {
-	            return _react2.default.createElement('div', { className: 'indicator',
-	                style: {
-	                    width: '25px',
-	                    height: '25px',
-	                    position: 'absolute',
-	                    top: '50%',
-	                    left: '50%',
-	                    transform: 'translate(-50%, -50%)',
-	                    borderRadius: '100px',
-	                    border: '4px solid rgba(' + this.props.color.r + ', ' + this.props.color.g + ', ' + this.props.color.b + ', 0.5)' } });
+	            var color = 'rgba(' + this.props.color.r + ', ' + this.props.color.g + ', ' + this.props.color.b + ', 0.5)';
+	            return _react2.default.createElement(
+	                'div',
+	                null,
+	                _react2.default.createElement('div', { className: 'indicator', style: { borderColor: color, color: color } }),
+	                _react2.default.createElement('div', { className: 'lower-indicator', style: { background: 'rgb(' + this.props.color.r + ', ' + this.props.color.g + ', ' + this.props.color.b + ')' } })
+	            );
 	        }
 	    }]);
 
@@ -23074,6 +23030,59 @@
 	                window.tinycolor = tinycolor;
 	            }
 	})(Math);
+
+/***/ },
+/* 182 */,
+/* 183 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var tinycolor = __webpack_require__(181);
+
+	/**
+	 * Maps luminance directly to vibration strength
+	 */
+
+	var WavelengthMapper = function () {
+	    function WavelengthMapper(applyVibration) {
+	        _classCallCheck(this, WavelengthMapper);
+
+	        this._applyVibration = applyVibration;
+
+	        this._luminance = 0;
+
+	        this.updateVibrations();
+	    }
+
+	    _createClass(WavelengthMapper, [{
+	        key: "updateVibrations",
+	        value: function updateVibrations() {
+	            var _this = this;
+
+	            this._applyVibration(this._luminance, function () {
+	                _this.updateVibrations();
+	            });
+	        }
+	    }, {
+	        key: "onSampleChanged",
+	        value: function onSampleChanged(rgb) {
+	            this._luminance = tinycolor(rgb).getLuminance();
+	        }
+	    }]);
+
+	    return WavelengthMapper;
+	}();
+
+	exports.default = WavelengthMapper;
 
 /***/ }
 /******/ ]);
