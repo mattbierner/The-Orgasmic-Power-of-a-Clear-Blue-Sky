@@ -22,7 +22,6 @@ NSString* const defaultUrl = @"http://192.168.1.6:8080/test.html";
     self.bridge = [WebViewJavascriptBridge bridgeForWebView:webView];
     //[WebViewJavascriptBridge enableLogging];
    
-    [self.bridge setWebViewDelegate:self];
     [self.bridge registerHandler:@"ready" handler:^(id data, WVJBResponseCallback responseCallback) {
         NSLog(@"webview is ready");
         _ready = YES;
@@ -32,11 +31,15 @@ NSString* const defaultUrl = @"http://192.168.1.6:8080/test.html";
     [self.bridge registerHandler:@"vibrate" handler:^(id data, WVJBResponseCallback responseCallback) {
         if (_device) {
             NSDictionary* values = data;
-            NSNumber* s = [values valueForKey:@"strength"];
-            [_device setVibration:[s intValue] onComplete:^(BOOL ok, NSError* err) {
-                responseCallback(data);
-            }];
+            id value = [values objectForKey:@"strength"];
+            if (value && [value isKindOfClass:[NSNumber class]]) {
+                [_device setVibration:[(NSNumber*)value intValue] onComplete:^(BOOL ok, NSError* err) {
+                    responseCallback(data);
+                }];
+                return;
+            }
         }
+        responseCallback(data);
     }];
     
     // Set up two tap to stop recording
@@ -147,9 +150,5 @@ NSString* const defaultUrl = @"http://192.168.1.6:8080/test.html";
     }];
 }
 
-
-- (void) webViewDidStartLoad:(UIWebView *)webView {
-    _ready = NO;
-}
 
 @end

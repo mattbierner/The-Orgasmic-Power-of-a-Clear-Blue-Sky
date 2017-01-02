@@ -101,6 +101,9 @@
 	    }, 0);
 	}
 
+	var lowestFrequency = 0.05;
+	var highestFrequency = 1.2;
+
 	var Main = function (_React$Component) {
 	    _inherits(Main, _React$Component);
 
@@ -113,6 +116,10 @@
 	            image: null
 	        };
 
+	        _this._frequency = lowestFrequency;
+	        _this._strength = 0;
+	        _this._enabled = true;
+
 	        loadStream(0).then(function (img1) {
 	            _this.setState({ image: img1 });
 	        }).catch(function (x) {
@@ -122,26 +129,57 @@
 	        setupWebViewJavascriptBridge(function (bridge) {
 	            _this._bridge = bridge;
 	            // Inform webview that we are ready
-	            bridge.callHandler('ready', {}, function (response) {/* noop */});
+	            bridge.callHandler('ready', {}, function (response) {
+	                _this.updateVibrations();
+	            });
 	        });
 	        return _this;
 	    }
 
 	    _createClass(Main, [{
-	        key: 'onSampleChanged',
-	        value: function onSampleChanged(rgb) {
+	        key: 'updateVibrations',
+	        value: function updateVibrations() {
 	            var _this2 = this;
 
-	            if (!this._bridge || this._updating) return;
+	            var time = Date.now();
 
-	            var hsl = tinycolor(rgb).toHsl();
-	            console.log(hsl);
-	            this._updating = true;
+	            var period = lowestFrequency + this._frequency * (highestFrequency - lowestFrequency);
+	            var strength = Math.floor(this._strength * 20) * (this._enabled ? 1 : 0);
 
-	            var s = Math.floor(hsl.s * 20);
-	            this._bridge.callHandler('vibrate', { 'strength': s }, function (responseData) {
-	                _this2._updating = false;
+	            console.log(strength, period);
+	            this._bridge.callHandler('vibrate', { strength: strength }, function (responseData) {
+	                var elapsed = (Date.now() - time) / 1000;
+	                setTimeout(function () {
+	                    var afterStartTime = Date.now();
+	                    _this2._bridge.callHandler('vibrate', { strength: 0 }, function (responseData) {
+	                        var elapsed = (Date.now() - afterStartTime) / 1000;
+	                        setTimeout(function () {
+	                            return _this2.updateVibrations();
+	                        }, Math.max(0, (period - elapsed) * 1000));
+	                    });
+	                }, Math.max(0, (period - elapsed) * 1000));
 	            });
+	        }
+	    }, {
+	        key: 'onSampleChanged',
+	        value: function onSampleChanged(rgb) {
+	            var hsv = tinycolor(rgb).toHsv();
+	            if (hsv.v < 0.3 || hsv.s < 0.3) {
+	                this._strength = 0;
+	                this._enabled = false;
+	            } else {
+	                this._strength = (hsv.s - 0.3) / 2.0 + (hsv.v - 0.3) / 2.0;
+	                this._enabled = true;
+	            }
+
+	            var maxHue = 280;
+	            var frequency = hsv.h;
+	            // map red - blue to standard range, but wrap magenta back around
+	            if (frequency > maxHue) {
+	                frequency = maxHue - (frequency - maxHue) / (360 - maxHue) * maxHue;
+	            }
+
+	            this._frequency = 1.0 - frequency / 300;
 	        }
 	    }, {
 	        key: 'render',

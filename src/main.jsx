@@ -21,12 +21,19 @@ function setupWebViewJavascriptBridge(callback) {
     setTimeout(function () { document.documentElement.removeChild(WVJBIframe) }, 0)
 }
 
+const lowestFrequency = 0.05
+const highestFrequency = 1.2
+
 class Main extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             image: null
         }
+
+        this._frequency = lowestFrequency
+        this._strength = 0
+        this._enabled = true
 
         loadStream(0)
             .then(img1 => {
@@ -38,24 +45,50 @@ class Main extends React.Component {
         setupWebViewJavascriptBridge(bridge => {
             this._bridge = bridge
             // Inform webview that we are ready
-            bridge.callHandler('ready', {}, (response) => { /* noop */ })
+            bridge.callHandler('ready', {}, (response) => { 
+                this.updateVibrations()
+            })
+        })
+    }
 
+    updateVibrations() {
+        const time = Date.now()
         
+        const period = lowestFrequency + this._frequency * (highestFrequency - lowestFrequency);
+        let strength = Math.floor(this._strength * 20) * (this._enabled ? 1 : 0)
+        
+        console.log(strength, period)
+        this._bridge.callHandler('vibrate', { strength }, responseData => {
+            const elapsed = (Date.now() - time) / 1000
+            setTimeout(() => {
+                const afterStartTime = Date.now()
+                this._bridge.callHandler('vibrate', { strength: 0 }, responseData => {
+                    const elapsed = (Date.now() - afterStartTime) / 1000
+                    setTimeout(
+                    () => this.updateVibrations(),  Math.max(0, (period - elapsed) * 1000));
+                })
+            }, Math.max(0, (period - elapsed) * 1000))
         })
     }
 
     onSampleChanged(rgb) {
-        if (!this._bridge || this._updating)
-            return;
+        const hsv = tinycolor(rgb).toHsv()
+        if (hsv.v < 0.3 || hsv.s < 0.3) {
+            this._strength = 0
+            this._enabled = false
+        } else {
+            this._strength = (hsv.s - 0.3) / 2.0 + (hsv.v - 0.3) / 2.0
+            this._enabled = true
+        }
+        
+        const maxHue = 280
+        let frequency = hsv.h
+        // map red - blue to standard range, but wrap magenta back around
+        if (frequency > maxHue) {
+            frequency = maxHue - ((frequency - maxHue) / (360 - maxHue)) * maxHue
+        }
 
-        const hsl = tinycolor(rgb).toHsl();
-        console.log(hsl);
-        this._updating  = true
-
-        const s = Math.floor(hsl.s * 20);
-        this._bridge.callHandler('vibrate', { 'strength': s }, responseData => {
-            this._updating = false
-        })
+        this._frequency = 1.0 - frequency / 300
     }
 
     render() {
