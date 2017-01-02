@@ -3,7 +3,7 @@ const tinycolor = require("tinycolor2")
 /**
  * Maps luminance directly to vibration strength
  */
-export default class WavelengthMapper {
+export default class luminanceMapper {
     constructor(applyVibration) {
         this._applyVibration = applyVibration
 
@@ -19,7 +19,9 @@ export default class WavelengthMapper {
     }
 
     onSampleChanged(rgb) {
-        this._luminance = tinycolor(rgb).getLuminance()
+        const hsv = tinycolor(rgb).toHsv()
+
+
     }
 }
 

@@ -68,9 +68,9 @@
 
 	var _load_image2 = _interopRequireDefault(_load_image);
 
-	var _luminance = __webpack_require__(183);
+	var _hue = __webpack_require__(185);
 
-	var _luminance2 = _interopRequireDefault(_luminance);
+	var _hue2 = _interopRequireDefault(_hue);
 
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -126,7 +126,7 @@
 	        setupWebViewJavascriptBridge(function (bridge) {
 	            _this._bridge = bridge;
 
-	            _this._vibrator = new _luminance2.default(function (strength, cb) {
+	            _this._vibrator = new _hue2.default(function (strength, cb) {
 	                strength = Math.floor(strength * maxStrength);
 
 	                _this._bridge.callHandler('vibrate', { strength: strength }, cb);
@@ -23033,7 +23033,9 @@
 
 /***/ },
 /* 182 */,
-/* 183 */
+/* 183 */,
+/* 184 */,
+/* 185 */
 /***/ function(module, exports, __webpack_require__) {
 
 	"use strict";
@@ -23048,41 +23050,58 @@
 
 	var tinycolor = __webpack_require__(181);
 
+	var maxHue = 280;
+
+	var minS = 0.3;
+	var minV = 0.3;
+
 	/**
-	 * Maps luminance directly to vibration strength
+	 * Maps hue to vibration strength (blue fastest, red slowest) but also filter out whites and blacks
 	 */
 
-	var WavelengthMapper = function () {
-	    function WavelengthMapper(applyVibration) {
-	        _classCallCheck(this, WavelengthMapper);
+	var HueMapper = function () {
+	    function HueMapper(applyVibration) {
+	        _classCallCheck(this, HueMapper);
 
 	        this._applyVibration = applyVibration;
 
-	        this._luminance = 0;
+	        this._frequency = 0;
 
 	        this.updateVibrations();
 	    }
 
-	    _createClass(WavelengthMapper, [{
+	    _createClass(HueMapper, [{
 	        key: "updateVibrations",
 	        value: function updateVibrations() {
 	            var _this = this;
 
-	            this._applyVibration(this._luminance, function () {
+	            this._applyVibration(this._frequency, function () {
 	                _this.updateVibrations();
 	            });
 	        }
 	    }, {
 	        key: "onSampleChanged",
 	        value: function onSampleChanged(rgb) {
-	            this._luminance = tinycolor(rgb).getLuminance();
+	            var hsv = tinycolor(rgb).toHsv();
+	            if (hsv.s < minS || hsv.v < minV) {
+	                this._frequency = 0;
+	                return;
+	            }
+
+	            var frequency = hsv.h;
+	            // map red - blue to standard range, but wrap magenta back around
+	            if (frequency > maxHue) {
+	                frequency = maxHue - (frequency - maxHue) / (360 - maxHue) * maxHue;
+	            }
+
+	            this._frequency = Math.max(frequency / maxHue, 1 / 20);
 	        }
 	    }]);
 
-	    return WavelengthMapper;
+	    return HueMapper;
 	}();
 
-	exports.default = WavelengthMapper;
+	exports.default = HueMapper;
 
 /***/ }
 /******/ ]);

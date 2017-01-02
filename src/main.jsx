@@ -4,8 +4,7 @@ import ReactDOM from 'react-dom';
 import Viewer from './viewer'
 import * as config from './config'
 import loadImage from './util/load_image'
-
-import Wavelength from './vibrations/luminance'
+import VibratorController from './vibrations/hue2'
 
 const maxStrength = 20
 
@@ -41,7 +40,7 @@ class Main extends React.Component {
         setupWebViewJavascriptBridge(bridge => {
             this._bridge = bridge
 
-            this._vibrator = new Wavelength((strength, cb) => {
+            this._vibrator = new VibratorController((strength, cb) => {
                 strength = Math.floor(strength * maxStrength)
 
                 this._bridge.callHandler('vibrate', { strength }, cb)
