@@ -30,7 +30,7 @@ export default class HueMapper {
             frequency = maxHue - ((frequency - maxHue) / (360 - maxHue)) * maxHue
         }
 
-        this._frequency = Math.max(frequency / maxHue), 1 / 20);
+        this._frequency = Math.max(frequency / maxHue, 1 / 20);
     }
 }
 

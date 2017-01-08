@@ -36,16 +36,17 @@ class Main extends React.Component {
             }).catch(x => {
                 console.error(x)
             })
+        
+        if (!config.sepectator) {
+            setupWebViewJavascriptBridge(bridge => {
+                this._bridge = bridge
 
-        setupWebViewJavascriptBridge(bridge => {
-            this._bridge = bridge
-
-            this._vibrator = new VibratorController((strength, cb) => {
-                strength = Math.floor(strength * maxStrength)
-
-                this._bridge.callHandler('vibrate', { strength }, cb)
+                this._vibrator = new VibratorController((strength, cb) => {
+                    strength = Math.floor(strength * maxStrength)
+                    this._bridge.callHandler('vibrate', { strength }, cb)
+                })
             })
-        })
+        }
     }
 
     onSampleChanged(rgb) {
@@ -53,10 +54,15 @@ class Main extends React.Component {
     }
 
     render() {
+        // switch rendering mode
+        // normal: shows view with overlay for color
+        // color: shows only the current target color
+        // black: shows nothing in view
+        const mode = 'normal'; // normal, color, black
         return (
             <div className="main">
-                <Viewer image={this.state.image} onSampleChanged={this.onSampleChanged.bind(this)} />
-                <Viewer image={this.state.image} />
+                <Viewer mode={mode} image={this.state.image} onSampleChanged={this.onSampleChanged.bind(this)} />
+                <Viewer mode={mode} image={this.state.image} />
             </div>)
     }
 }

@@ -1,12 +1,13 @@
 const tinycolor = require("tinycolor2")
 
-const maxHue = 280
+const targetHue = 240
+const targetRange = 30
 
-const minS = 0.2
-const minV = 0.15
+const minS = 0.4
+const minV = 0.4
 
 /**
- * Maps hue to vibration strength (blue fastest, red slowest) but also filter out whites and blacks
+ * Activate based on closeness to target hue.
  */
 export default class HueMapper {
     constructor(applyVibration) {
@@ -28,14 +29,8 @@ export default class HueMapper {
             this._frequency = 0
             return;
         }
-
-        let frequency = hsv.h
-        // map red - blue to standard range, but wrap magenta back around
-        if (frequency > maxHue) {
-            frequency = maxHue - ((frequency - maxHue) / (360 - maxHue)) * maxHue
-        }
-
-        this._frequency = Math.max(frequency / maxHue, 1 / 20);
+        const diff = Math.abs(hsv.h - targetHue)
+        this._frequency = (diff < targetRange ? 1 : 0) * (1 - diff / targetRange)
     }
 }
 

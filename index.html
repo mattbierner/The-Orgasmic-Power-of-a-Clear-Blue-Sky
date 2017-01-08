@@ -11,6 +11,7 @@
             height: 100vh;
             margin: 0;
             padding: 0;
+            background: black;
         }
         
         .eye {
@@ -34,7 +35,9 @@
 
         .indicator::before {
             content: "+";
+            display: block;
             position: absolute;
+            margin-top: -2px;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
@@ -45,8 +48,8 @@
 
         .lower-indicator {
             position: absolute;
-            bottom: -6px;
-            right: -6px;
+            bottom: 6px;
+            right: 6px;
             width: 50px;
             height: 50px;
          }

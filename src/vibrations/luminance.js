@@ -19,9 +19,7 @@ export default class luminanceMapper {
     }
 
     onSampleChanged(rgb) {
-        const hsv = tinycolor(rgb).toHsv()
-
-
+        this._luminance = tinycolor(rgb).getLuminance()
     }
 }
 

@@ -68,7 +68,7 @@
 
 	var _load_image2 = _interopRequireDefault(_load_image);
 
-	var _hue = __webpack_require__(185);
+	var _hue = __webpack_require__(181);
 
 	var _hue2 = _interopRequireDefault(_hue);
 
@@ -123,15 +123,16 @@
 	            console.error(x);
 	        });
 
-	        setupWebViewJavascriptBridge(function (bridge) {
-	            _this._bridge = bridge;
+	        if (!config.sepectator) {
+	            setupWebViewJavascriptBridge(function (bridge) {
+	                _this._bridge = bridge;
 
-	            _this._vibrator = new _hue2.default(function (strength, cb) {
-	                strength = Math.floor(strength * maxStrength);
-
-	                _this._bridge.callHandler('vibrate', { strength: strength }, cb);
+	                _this._vibrator = new _hue2.default(function (strength, cb) {
+	                    strength = Math.floor(strength * maxStrength);
+	                    _this._bridge.callHandler('vibrate', { strength: strength }, cb);
+	                });
 	            });
-	        });
+	        }
 	        return _this;
 	    }
 
@@ -143,11 +144,16 @@
 	    }, {
 	        key: 'render',
 	        value: function render() {
+	            // switch rendering mode
+	            // normal: shows view with overlay for color
+	            // color: shows only the current target color
+	            // black: shows nothing in view
+	            var mode = 'normal'; // normal, color, black
 	            return _react2.default.createElement(
 	                'div',
 	                { className: 'main' },
-	                _react2.default.createElement(_viewer2.default, { image: this.state.image, onSampleChanged: this.onSampleChanged.bind(this) }),
-	                _react2.default.createElement(_viewer2.default, { image: this.state.image })
+	                _react2.default.createElement(_viewer2.default, { mode: mode, image: this.state.image, onSampleChanged: this.onSampleChanged.bind(this) }),
+	                _react2.default.createElement(_viewer2.default, { mode: mode, image: this.state.image })
 	            );
 	        }
 	    }]);
@@ -21653,11 +21659,22 @@
 	        key: 'render',
 	        value: function render() {
 	            var color = 'rgba(' + this.props.color.r + ', ' + this.props.color.g + ', ' + this.props.color.b + ', 0.5)';
+
+	            var lowerStyle = { background: 'rgb(' + this.props.color.r + ', ' + this.props.color.g + ', ' + this.props.color.b + ')' };
+	            if (this.props.mode === 'color') {
+	                lowerStyle.width = '100%';
+	                lowerStyle.height = '100%';
+	            }
+
 	            return _react2.default.createElement(
 	                'div',
 	                null,
-	                _react2.default.createElement('div', { className: 'indicator', style: { borderColor: color, color: color } }),
-	                _react2.default.createElement('div', { className: 'lower-indicator', style: { background: 'rgb(' + this.props.color.r + ', ' + this.props.color.g + ', ' + this.props.color.b + ')' } })
+	                _react2.default.createElement('div', { className: 'indicator', style: {
+	                        borderColor: color,
+	                        color: color,
+	                        display: this.props.mode === 'black' ? 'none' : 'block'
+	                    } }),
+	                _react2.default.createElement('div', { className: 'lower-indicator', style: lowerStyle })
 	            );
 	        }
 	    }]);
@@ -21720,7 +21737,8 @@
 	    }, {
 	        key: '_sampleColor',
 	        value: function _sampleColor(ctx) {
-	            var sampleSets = [{ weight: 0.4, offset: 1, count: 4 }, { weight: 0.6, offset: 15, count: 8 }];
+	            var sampleSets = [{ weight: 0.4, offset: 2, count: 4 }, { weight: 0.3, offset: 6, count: 8 }, { weight: 0.3, offset: 12, count: 16 }];
+
 	            var center = { x: Math.round(this._canvas.width / 2), y: Math.round(this._canvas.height / 2) };
 	            var sum = { r: 0, g: 0, b: 0 };
 	            var _iteratorNormalCompletion = true;
@@ -21771,10 +21789,14 @@
 	            return _react2.default.createElement(
 	                'div',
 	                { className: 'eye' },
-	                _react2.default.createElement('canvas', { style: { width: '100%', height: '100%' }, ref: function ref(canvas) {
+	                _react2.default.createElement('canvas', { style: {
+	                        width: '100%',
+	                        height: '100%',
+	                        display: this.props.mode === 'black' ? 'none' : 'block'
+	                    }, ref: function ref(canvas) {
 	                        _this4._canvas = canvas;
 	                    } }),
-	                _react2.default.createElement(Indicator, { color: this.state.color })
+	                _react2.default.createElement(Indicator, { mode: this.props.mode, color: this.state.color })
 	            );
 	        }
 	    }]);
@@ -21804,9 +21826,9 @@
 	var viewerUrl = exports.viewerUrl = 'http://' + ip + ':1234/';
 
 	/**
-	 * Should data from two cameras be collected?
+	 * Enables sepectatorMode so that you only see 
 	 */
-	var stereo = exports.stereo = false;
+	var sepectator = exports.sepectator = window.location.href.indexOf('sepectator') >= 0;
 
 /***/ },
 /* 180 */
@@ -21843,6 +21865,74 @@
 
 /***/ },
 /* 181 */
+/***/ function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	var tinycolor = __webpack_require__(182);
+
+	var maxHue = 280;
+
+	var minS = 0.2;
+	var minV = 0.15;
+
+	/**
+	 * Maps hue to vibration strength (blue fastest, red slowest) but also filter out whites and blacks
+	 */
+
+	var HueMapper = function () {
+	    function HueMapper(applyVibration) {
+	        _classCallCheck(this, HueMapper);
+
+	        this._applyVibration = applyVibration;
+	        this._frequency = 0;
+
+	        this.updateVibrations();
+	    }
+
+	    _createClass(HueMapper, [{
+	        key: "updateVibrations",
+	        value: function updateVibrations() {
+	            var _this = this;
+
+	            this._applyVibration(this._frequency, function () {
+	                _this.updateVibrations();
+	            });
+	        }
+	    }, {
+	        key: "onSampleChanged",
+	        value: function onSampleChanged(rgb) {
+	            var hsv = tinycolor(rgb).toHsv();
+	            if (hsv.s < minS || hsv.v < minV) {
+	                this._frequency = 0;
+	                return;
+	            }
+
+	            var frequency = hsv.h;
+	            // map red - blue to standard range, but wrap magenta back around
+	            if (frequency > maxHue) {
+	                frequency = maxHue - (frequency - maxHue) / (360 - maxHue) * maxHue;
+	            }
+
+	            this._frequency = Math.max(frequency / maxHue, 1 / 20);
+	        }
+	    }]);
+
+	    return HueMapper;
+	}();
+
+	exports.default = HueMapper;
+
+/***/ },
+/* 182 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;"use strict";
@@ -23030,78 +23120,6 @@
 	                window.tinycolor = tinycolor;
 	            }
 	})(Math);
-
-/***/ },
-/* 182 */,
-/* 183 */,
-/* 184 */,
-/* 185 */
-/***/ function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	var tinycolor = __webpack_require__(181);
-
-	var maxHue = 280;
-
-	var minS = 0.3;
-	var minV = 0.3;
-
-	/**
-	 * Maps hue to vibration strength (blue fastest, red slowest) but also filter out whites and blacks
-	 */
-
-	var HueMapper = function () {
-	    function HueMapper(applyVibration) {
-	        _classCallCheck(this, HueMapper);
-
-	        this._applyVibration = applyVibration;
-
-	        this._frequency = 0;
-
-	        this.updateVibrations();
-	    }
-
-	    _createClass(HueMapper, [{
-	        key: "updateVibrations",
-	        value: function updateVibrations() {
-	            var _this = this;
-
-	            this._applyVibration(this._frequency, function () {
-	                _this.updateVibrations();
-	            });
-	        }
-	    }, {
-	        key: "onSampleChanged",
-	        value: function onSampleChanged(rgb) {
-	            var hsv = tinycolor(rgb).toHsv();
-	            if (hsv.s < minS || hsv.v < minV) {
-	                this._frequency = 0;
-	                return;
-	            }
-
-	            var frequency = hsv.h;
-	            // map red - blue to standard range, but wrap magenta back around
-	            if (frequency > maxHue) {
-	                frequency = maxHue - (frequency - maxHue) / (360 - maxHue) * maxHue;
-	            }
-
-	            this._frequency = Math.max(frequency / maxHue, 1 / 20);
-	        }
-	    }]);
-
-	    return HueMapper;
-	}();
-
-	exports.default = HueMapper;
 
 /***/ }
 /******/ ]);

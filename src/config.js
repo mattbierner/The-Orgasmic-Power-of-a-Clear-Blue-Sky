@@ -9,6 +9,6 @@ export const ip = window.location.href.indexOf('phone') >= 0 ? '172.20.10.3' : '
 export const viewerUrl =  `http://${ip}:1234/`
 
 /**
- * Should data from two cameras be collected?
+ * Enables sepectatorMode so that you only see 
  */
-export const stereo = false
+export const sepectator = window.location.href.indexOf('sepectator') >= 0
